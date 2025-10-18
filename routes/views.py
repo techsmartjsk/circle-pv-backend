@@ -1,5 +1,4 @@
 import os
-import numpy as np
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from skimage.io import imread
@@ -20,10 +19,10 @@ from django.views.decorators.csrf import csrf_exempt
 import datetime
 from django.db import transaction
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'model_pipeline.pkl')
+# MODEL_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'model_pipeline.pkl')
 ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'label_encoder.pkl')
 
-model = joblib.load(MODEL_PATH)
+# model = joblib.load(MODEL_PATH)
 label_encoder = joblib.load(ENCODER_PATH)
 
 TEMP_SURFACE_FLAT_TOLERANCE = 2         # minimal surface fluctuation
@@ -44,32 +43,32 @@ def _safe_int(val, default=0):
     except (TypeError, ValueError):
         return default
 
-def extract_image_features_from_array(img_resized):
-    """
-    Build a compact, robust feature vector for image-based classifier:
-    - mean & std per channel
-    - overall mean & std
-    - dark / bright pixel fractions
-    - edge mean & density
-    """
-    if img_resized is None:
-        return np.zeros((1, 12), dtype=float)
-    H, W, C = img_resized.shape
-    flat = img_resized.reshape(-1, 3)
-    means = flat.mean(axis=0)        
-    stds = flat.std(axis=0)          
-    overall_mean = flat.mean()       
-    overall_std = flat.std()          
-    lum = img_resized.mean(axis=2)   
-    dark_frac = float((lum < 0.1).sum()) / lum.size
-    bright_frac = float((lum > 0.9).sum()) / lum.size
+# def extract_image_features_from_array(img_resized):
+#     """
+#     Build a compact, robust feature vector for image-based classifier:
+#     - mean & std per channel
+#     - overall mean & std
+#     - dark / bright pixel fractions
+#     - edge mean & density
+#     """
+#     if img_resized is None:
+#         return np.zeros((1, 12), dtype=float)
+#     H, W, C = img_resized.shape
+#     flat = img_resized.reshape(-1, 3)
+#     means = flat.mean(axis=0)        
+#     stds = flat.std(axis=0)          
+#     overall_mean = flat.mean()       
+#     overall_std = flat.std()          
+#     lum = img_resized.mean(axis=2)   
+#     dark_frac = float((lum < 0.1).sum()) / lum.size
+#     bright_frac = float((lum > 0.9).sum()) / lum.size
 
-    vec = np.concatenate([
-        means.flatten(),
-        stds.flatten(),
-        np.array([overall_mean, overall_std, dark_frac, bright_frac])
-    ])
-    return vec.reshape(1, -1)  # shape (1, 12)
+#     vec = np.concatenate([
+#         means.flatten(),
+#         stds.flatten(),
+#         np.array([overall_mean, overall_std, dark_frac, bright_frac])
+#     ])
+#     return vec.reshape(1, -1)  # shape (1, 12)
 
 def compute_damage_type_from_temps(c1, c2, t1, t2):
     """
@@ -244,49 +243,49 @@ def predict_damage(request):
     except Exception:
         S_value_float = 0.0
 
-    try:
-        img = imread(image_file)
-        if img.ndim == 2:
-            img = np.stack((img,) * 3, axis=-1)
-        elif img.shape[2] == 4:
-            img = img[..., :3]
-        img_resized = resize(img, (128, 128), anti_aliasing=True)
-        grey = img_resized.mean(axis=-1)
-        edges = sobel(grey)
-        edge_mean = float(edges.mean())
-        edge_density = float((edges > edges.mean()).sum()) / edges.size
-        image_feat = extract_image_features_from_array(img_resized)  # shape (1, n)
-        image_feat = np.concatenate([image_feat, np.array([[edge_mean, edge_density]])], axis=1)
-    except Exception as e:
-        # fallback if image read fails
-        image_feat = np.zeros((1, 14), dtype=float)
-        edge_mean = 0.0
-        edge_density = 0.0
+    # try:
+    #     img = imread(image_file)
+    #     if img.ndim == 2:
+    #         img = np.stack((img,) * 3, axis=-1)
+    #     elif img.shape[2] == 4:
+    #         img = img[..., :3]
+    #     img_resized = resize(img, (128, 128), anti_aliasing=True)
+    #     grey = img_resized.mean(axis=-1)
+    #     edges = sobel(grey)
+    #     edge_mean = float(edges.mean())
+    #     edge_density = float((edges > edges.mean()).sum()) / edges.size
+    #     image_feat = extract_image_features_from_array(img_resized)  # shape (1, n)
+    #     image_feat = np.concatenate([image_feat, np.array([[edge_mean, edge_density]])], axis=1)
+    # except Exception as e:
+    #     # fallback if image read fails
+    #     image_feat = np.zeros((1, 14), dtype=float)
+    #     edge_mean = 0.0
+    #     edge_density = 0.0
 
     label = "Unknown"
     damage_prob = None
-    try:
-        pred = model.predict(image_feat)
-        if hasattr(label_encoder, 'inverse_transform'):
-            try:
-                label = label_encoder.inverse_transform([pred[0]])[0]
-            except Exception:
-                label = str(pred[0])
-        else:
-            label = str(pred[0])
-        if hasattr(model, 'predict_proba'):
-            try:
-                probs = model.predict_proba(image_feat)[0]
-                if hasattr(model, 'classes_'):
-                    idx = list(model.classes_).index(pred[0])
-                    damage_prob = float(probs[idx])
-                else:
-                    damage_prob = float(max(probs))
-            except Exception:
-                damage_prob = None
-    except Exception:
-        label = "Prediction failed"
-        damage_prob = None
+    # try:
+    #     pred = model.predict(image_feat)
+    #     if hasattr(label_encoder, 'inverse_transform'):
+    #         try:
+    #             label = label_encoder.inverse_transform([pred[0]])[0]
+    #         except Exception:
+    #             label = str(pred[0])
+    #     else:
+    #         label = str(pred[0])
+    #     if hasattr(model, 'predict_proba'):
+    #         try:
+    #             probs = model.predict_proba(image_feat)[0]
+    #             if hasattr(model, 'classes_'):
+    #                 idx = list(model.classes_).index(pred[0])
+    #                 damage_prob = float(probs[idx])
+    #             else:
+    #                 damage_prob = float(max(probs))
+    #         except Exception:
+    #             damage_prob = None
+    # except Exception:
+    #     label = "Prediction failed"
+    #     damage_prob = None
 
     damage_score = None
     if damage_prob is not None:
@@ -295,7 +294,8 @@ def predict_damage(request):
         else:
             damage_score = damage_prob       # higher prob => more damaged
     else:
-        damage_score = float(min(1.0, max(0.0, edge_density * 2.0 * (1.0 if S_value_float < 1.0 else 0.5))))
+        # damage_score = float(min(1.0, max(0.0, edge_density * 2.0 * (1.0 if S_value_float < 1.0 else 0.5))))
+        damage_score = float(min(1.0, max(0.0, 2.0 * (1.0 if S_value_float < 1.0 else 0.5))))
 
     decision = "Undetermined"
     action_recommendations = []
@@ -364,8 +364,6 @@ def predict_damage(request):
                 'S_value': S_value_float,
                 'decision': decision,
                 'damage_score': damage_score,
-                'edge_mean': edge_mean,
-                'edge_density': edge_density,
             }
             for k, v in optional_updates.items():
                 if hasattr(solar_panel, k):
