@@ -1,19 +1,17 @@
 from pathlib import Path
-import pymysql
 import os
 from datetime import timedelta
-
-pymysql.install_as_MySQLdb()
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-
-SECRET_KEY = "django-insecure-l3)z!k6o!ca@jqd$8w_)*h-kx!12vdg&(ypk-a0!2ifts6pec0"
-
-DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
+DEBUG = False
 
 ALLOWED_HOSTS = [
-    "*"
+    "127.0.0.1", ".vercel.app", ".now.sh"
 ]
 
 
@@ -90,12 +88,12 @@ WSGI_APPLICATION = "backend.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "circlepv",
-        "USER": "root",
-        "PASSWORD": "root@123",
-        "HOST": "127.0.0.1",
-        "PORT": "3306",
+        "ENGINE": env("ENGINE", default="django.db.backends.postgresql"),
+        "NAME": env("DB_NAME", default="postgres"),
+        "USER": env("USERNAME", default="postgres"),
+        "PASSWORD": env("PASSWORD", default="root@123"),
+        "HOST": env("HOST", default="db.hhxjpmehldlseumyjsgg.supabase.co"),
+        "PORT": env("PORT", default="6543"),
     }
 }
 
@@ -134,9 +132,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "ui/static")]
 STATIC_URL = "static/"
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, "ui/staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

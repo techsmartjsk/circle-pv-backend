@@ -3,6 +3,8 @@ from .views import *
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("register/", RegisterView.as_view(), name='register'),
@@ -16,3 +18,6 @@ urlpatterns = [
     path("contact/list/", ContactFormListView.as_view(), name='contact_list'),
     path("company/all/", ManufacturerDataListView.as_view(), name='manufacturer_list'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
