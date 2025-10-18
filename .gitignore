@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+*.env
+*.venv
+*.log
+
+# VSCode and IDEs
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
+
+# Django specific
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+.env
+
+# Migrations (optional: include if you want to regenerate them)
+**/migrations/*.pyc
+**/migrations/__pycache__/
+**/migrations/000*
+**/ml_models/**
+
+# Node (if using with React/Vite frontend)
+node_modules/
+build/
+dist/
+*.lock
+
+# Celery & Cache
+celerybeat-schedule
+*.pid
+*.bak
+
+# Coverage / Testing
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.pytest_cache/
