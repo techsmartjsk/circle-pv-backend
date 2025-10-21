@@ -20,10 +20,10 @@ import datetime
 from django.db import transaction
 
 # MODEL_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'model_pipeline.pkl')
-ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'label_encoder.pkl')
+# ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'ml_models', 'label_encoder.pkl')
 
 # model = joblib.load(MODEL_PATH)
-label_encoder = joblib.load(ENCODER_PATH)
+# label_encoder = joblib.load(ENCODER_PATH)
 
 TEMP_SURFACE_FLAT_TOLERANCE = 2         # minimal surface fluctuation
 TEMP_AMBIENT_VARIATION = 5              # significant ambient swing
