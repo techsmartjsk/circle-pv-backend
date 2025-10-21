@@ -11,7 +11,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret-key")
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "127.0.0.1", ".vercel.app", ".now.sh"
+    "*"
 ]
 
 
