@@ -95,6 +95,9 @@ DATABASES = {
         "PASSWORD": env("PASSWORD", default="root@123"),
         "HOST": env("HOST", default="db.hhxjpmehldlseumyjsgg.supabase.co"),
         "PORT": env("PORT", default="6543"),
+        'OPTIONS': {
+            'sslmode': os.environ.get('PGSSLMODE', 'require')
+        },
     }
 }
 
